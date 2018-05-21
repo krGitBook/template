@@ -10,13 +10,15 @@ var minify = require('html-minifier').minify;
 var templatePath = path.resolve(__dirname+'/template');  
 var mainPath = path.resolve(__dirname+'/main'); 
 var pubilcPath = path.resolve(__dirname+'/public'); 
+var staticPath = path.resolve(__dirname+'/static');
 
 const templateFile = chokidar.watch(path.join(__dirname, '/template'));
 const mainFile = chokidar.watch(path.join(__dirname, '/main'));
+ 
 
 templateFile.on('ready', () => {
     templateFile.on('change', (path) => {
-        getMainHtml();
+        getStaticContent();
     });
     // watcher.on('add', (path) => {
     //     console.log('<---- watched new file add, do something ---->');
@@ -27,7 +29,7 @@ templateFile.on('ready', () => {
 })
 mainFile.on('ready', () => {
     mainFile.on('change', (path) => {
-        getMainHtml();
+        getStaticContent();
     });
     // watcher.on('add', (path) => {
     //     console.log('<---- watched new file add, do something ---->');
@@ -37,8 +39,31 @@ mainFile.on('ready', () => {
     // });
 })
 //获取插件部分的内容
-function getStaticContent(){
-
+function getStaticContent(mainContent,fileName){
+    // console.log(mainContent,"lllno")
+    fs.readdir(staticPath, 'utf8', function (err,data) {  
+        var result = '';
+        data.forEach(function(item, index) {  
+         
+            result = fs.readFileSync(staticPath+'/'+item, {
+                encoding: 'utf-8'
+            })  
+            // var templateReg = new RegExp('${'+ item +'}', 'ig');
+            var templateReg = new RegExp('${'+ item +'}', 'ig');
+            console.log(templateReg,"lllll")
+            var files = item.split('.');
+            var suffix = files[files.length -1];
+            if(suffix !='js'){
+                result = minify(result,{removeComments: true,collapseWhitespace: true,minifyJS:true, minifyCSS:true});
+            }
+            
+            
+            mainContent= mainContent.replace(templateReg,result)
+        });  
+       
+        render(mainContent,fileName);
+      
+    });  
 }
 //获取主文件的内容
 function getMainHtml(){
@@ -48,7 +73,11 @@ function getMainHtml(){
          
             fs.readFile(mainPath+'/'+item,'utf8',function(err,files){  
                 var result =  files;
-                render(result,item);
+                // result = result.replace('${'+fileName+'}',static)
+               
+                 getStaticContent(result,item);
+                
+                
        
             })  
         });  
