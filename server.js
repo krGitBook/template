@@ -11,10 +11,22 @@ var templatePath = path.resolve(__dirname+'/template');
 var mainPath = path.resolve(__dirname+'/main'); 
 var pubilcPath = path.resolve(__dirname+'/public'); 
 
-const watcher = chokidar.watch(path.join(__dirname, '/template'));
+const templateFile = chokidar.watch(path.join(__dirname, '/template'));
+const mainFile = chokidar.watch(path.join(__dirname, '/main'));
 
-watcher.on('ready', () => {
-    watcher.on('change', (path) => {
+templateFile.on('ready', () => {
+    templateFile.on('change', (path) => {
+        getMainHtml();
+    });
+    // watcher.on('add', (path) => {
+    //     console.log('<---- watched new file add, do something ---->');
+    // });
+    // watcher.on('unlink', (path) => {
+    //     console.log('<---- watched file remove, do something ---->');
+    // });
+})
+mainFile.on('ready', () => {
+    mainFile.on('change', (path) => {
         getMainHtml();
     });
     // watcher.on('add', (path) => {
