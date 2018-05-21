@@ -49,8 +49,8 @@ function getStaticContent(mainContent,fileName){
                 encoding: 'utf-8'
             })  
             // var templateReg = new RegExp('${'+ item +'}', 'ig');
-            var templateReg = new RegExp('${'+ item +'}', 'ig');
-            console.log(templateReg,"lllll")
+            var templateReg = new RegExp('\\$\\{'+ item +'\\}', 'ig');
+            // console.log(templateReg,"lllll")
             var files = item.split('.');
             var suffix = files[files.length -1];
             if(suffix !='js'){
@@ -86,7 +86,7 @@ function getMainHtml(){
 }
 //获取生成查看文件
 function render(templateContent,fileName){
-    var templateReg = new RegExp('${template}', 'ig');
+    var templateReg = new RegExp('\\$\\{template\\}', 'ig');
     fs.readdir(templatePath, 'utf8', function (err,data) {  
       
        
@@ -96,7 +96,7 @@ function render(templateContent,fileName){
                
                 // var result = files.replace(/要替换的内容/g, '替换后的内容');  
                 var result = minify(files,{removeComments: true,collapseWhitespace: true,minifyJS:true, minifyCSS:true})
-                templateContent = templateContent.replace('${template}',result)
+                templateContent = templateContent.replace(templateReg,result)
                 fs.writeFile(pubilcPath+'/'+item, templateContent, 'utf8', function (err) {  
                      if (err) return console.log(err);  
                 });  
